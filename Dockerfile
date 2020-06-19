@@ -25,15 +25,16 @@ RUN \
 
 # Build and install libsndfile. Compile as a shared library to conform to LGPL.
 #
-# libsndfile-devel 1.0.25 is available through the package manager, but that
-# version doesn't provide a CMake package configuration file. Therefore, build a
-# more recent version.
-# TODO: Update when https://github.com/erikd/libsndfile/pull/524 is merged.
-ENV LIBSNDFILE_GIT_REF c103c16c972c3c30197ef0da963802ce7c33ad72
-ENV LIBSNDFILE_TARBALL_SHA256 17a43830e869987ae2dca7839363f7317b6ce00dfe161d507ef0b73ccc6b4c42
+# Note that libsndfile-devel is available through the package manager, but the
+# package depends on external libraries like libFLAC, libgsm, libogg, and
+# libvorbis. Using the precompiled package would require deploying all of these
+# libraries with the Lambda function. The custom build sets ENABLE_EXTERNAL_LIBS=OFF
+# to disable the external libraries.
+ENV LIBSNDFILE_GIT_REF 808fb07864727e64218fe0910abd7b900e575695
+ENV LIBSNDFILE_TARBALL_SHA256 d61864f10290dd60adb3c245ae80bcb0a8ee5a7e5d85c8732def0cbc3f39873a
 WORKDIR /opt/libsndfile
 RUN \
-  curl -L https://api.github.com/repos/msmolens/libsndfile/tarball/${LIBSNDFILE_GIT_REF} > libsndfile.tar.gz && \
+  curl -L https://api.github.com/repos/erikd/libsndfile/tarball/${LIBSNDFILE_GIT_REF} > libsndfile.tar.gz && \
   echo "$LIBSNDFILE_TARBALL_SHA256 libsndfile.tar.gz" | sha256sum -c -w --status - && \
   mkdir libsndfile && \
   tar zxf libsndfile.tar.gz --strip-components=1 && \
